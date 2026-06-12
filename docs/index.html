@@ -1,0 +1,859 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#111111" />
+<title>Reportaje · RK Palanca</title>
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Reportaje" />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+/* ================================================================
+   RK Palanca · WebApp Petición de Reportaje Fotográfico
+   ================================================================ */
+:root {
+  --orange:        #cf731b;
+  --orange-soft:   #fef4ec;
+  --orange-border: #f5c89a;
+  --black:   #111111;
+  --ink:     #1c1c1c;
+  --gray-1:  #f7f7f5;
+  --gray-2:  #efefec;
+  --gray-3:  #dddddd;
+  --gray-4:  #999999;
+  --gray-5:  #666666;
+  --white:   #ffffff;
+  --danger:  #b00020;
+  --success: #1f8a5b;
+  --radius:    10px;
+  --radius-sm:  6px;
+  --shadow-1:   0 1px 2px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-top: 0 -4px 12px rgba(0,0,0,0.08);
+  --font: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+html, body { margin: 0; padding: 0; }
+button, label, .chip, .section-header, .check-item { touch-action: manipulation; }
+body {
+  font-family: var(--font);
+  background: var(--gray-1);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: 100px;
+}
+
+/* HEADER */
+.app-header {
+  background: var(--black);
+  color: var(--white);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: var(--shadow-1);
+}
+.app-header .logo { height: 36px; width: auto; max-width: 180px; flex-shrink: 0; display: block; }
+.header-titles { flex: 1; min-width: 0; }
+.app-header .title {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--orange); margin: 0;
+}
+.app-header .subtitle { font-size: 13px; font-weight: 500; color: var(--white); margin: 0; }
+.app-header .status {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--gray-4);
+}
+.status .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
+.status.saving .dot { background: var(--orange); animation: pulse 0.8s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+@media (max-width: 540px) {
+  .header-titles .subtitle { display: none; }
+  .app-header .logo { height: 28px; max-width: 120px; }
+  .status .label { display: none; }
+}
+
+/* CONTAINER */
+.container { max-width: 760px; margin: 0 auto; padding: 16px; }
+
+/* AVISO */
+.notice {
+  background: var(--orange-soft);
+  border: 1px solid var(--orange-border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  font-size: 12px;
+  color: var(--gray-5);
+  display: flex; gap: 10px; align-items: center;
+}
+.notice strong { color: var(--orange); }
+
+/* SECCIONES (acordeón) */
+.section {
+  background: var(--white);
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
+}
+.section-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px 18px; cursor: pointer; user-select: none;
+  transition: background-color 0.08s;
+  -webkit-tap-highlight-color: transparent;
+}
+.section-header:active { background: var(--gray-2); }
+.section-num {
+  width: 26px; height: 26px; background: var(--orange); color: var(--white);
+  border-radius: 50%; font-size: 11px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.section.error .section-num { background: var(--danger); }
+.section-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--black); flex: 1;
+}
+.section-meta { font-size: 11px; font-weight: 500; color: var(--gray-4); }
+.section-chevron {
+  width: 12px; height: 12px;
+  border-right: 2px solid var(--gray-4); border-bottom: 2px solid var(--gray-4);
+  transform: rotate(45deg); transition: transform 0.2s;
+  margin-right: 4px; margin-bottom: 4px;
+}
+.section.open .section-chevron { transform: rotate(-135deg); margin-bottom: -2px; }
+.section-body { padding: 0 18px 18px; display: none; }
+.section.open .section-body { display: block; }
+
+/* FORM ELEMENTS */
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.field > label, .field-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--gray-5);
+}
+.field-label .required { color: var(--orange); margin-left: 2px; }
+.field-hint {
+  font-size: 11px; color: var(--gray-4); font-weight: 400;
+  letter-spacing: 0; text-transform: none; margin-top: -2px;
+}
+.field-hint.warn { color: var(--danger); font-weight: 600; }
+input[type="text"], input[type="tel"], input[type="url"], select, textarea {
+  font-family: inherit; font-size: 15px; font-weight: 500; color: var(--ink);
+  background: var(--white); border: 1px solid var(--gray-3);
+  border-radius: var(--radius-sm); padding: 11px 12px; width: 100%;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  -webkit-appearance: none; appearance: none;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: var(--orange);
+  box-shadow: 0 0 0 3px rgba(207, 115, 27, 0.15);
+}
+textarea { resize: vertical; min-height: 80px; }
+select {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'><path fill='%23999' d='M6 8L0 0h12z'/></svg>");
+  background-repeat: no-repeat; background-position: right 14px center;
+  background-size: 10px; padding-right: 36px;
+}
+.field.invalid input, .field.invalid select, .field.invalid textarea { border-color: var(--danger); }
+.field.invalid .field-label { color: var(--danger); }
+.field.invalid .chip-group .chip, .field.invalid .check-item .box { border-color: var(--danger); }
+
+/* GRIDS */
+.grid { display: grid; gap: 12px; }
+.grid-2 { grid-template-columns: 1fr 1fr; }
+@media (max-width: 540px) { .grid-2 { grid-template-columns: 1fr; } }
+
+/* CHIPS */
+.chip-group { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
+  padding: 8px 14px; border-radius: 20px;
+  border: 1px solid var(--gray-3); background: var(--white); color: var(--gray-5);
+  cursor: pointer; user-select: none;
+  transition: background-color 0.08s, border-color 0.08s, color 0.08s;
+  -webkit-tap-highlight-color: transparent;
+}
+.chip:active { background: var(--gray-2); transform: scale(0.97); }
+.chip:hover { border-color: var(--gray-4); }
+.chip[aria-pressed="true"] {
+  background: var(--orange-soft); border-color: var(--orange); color: var(--orange);
+}
+
+/* CHECKBOXES Y RADIOS */
+.check-group { display: flex; flex-direction: column; gap: 2px; }
+.check-group.wrap { flex-direction: row; flex-wrap: wrap; gap: 8px 16px; }
+.check-item {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 500; color: var(--ink);
+  cursor: pointer; user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  padding: 6px 0;
+}
+.check-item input { position: absolute; opacity: 0; width: 0; height: 0; }
+.check-item:active .box { background: var(--gray-2); }
+.check-item .box {
+  width: 20px; height: 20px;
+  border: 1.5px solid var(--gray-3); border-radius: 4px;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  transition: background-color 0.08s, border-color 0.08s;
+  background: var(--white);
+}
+.check-item.radio .box { border-radius: 50%; }
+.check-item input:checked + .box { background: var(--orange); border-color: var(--orange); }
+.check-item input:checked + .box::after {
+  content: ""; width: 10px; height: 5px;
+  border-left: 2px solid white; border-bottom: 2px solid white;
+  transform: rotate(-45deg) translate(1px, -1px);
+}
+.check-item.radio input:checked + .box::after {
+  width: 8px; height: 8px; border: none; background: white;
+  border-radius: 50%; transform: none;
+}
+.otro-input { margin-top: 6px; }
+.otro-input[hidden] { display: none; }
+
+/* SUBBLOQUE */
+.subblock {
+  background: var(--orange-soft);
+  border: 1px solid var(--orange-border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px; margin-top: 10px;
+}
+.subblock .field:last-child { margin-bottom: 0; }
+
+/* ACTION BAR */
+.actionbar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--white);
+  border-top: 1px solid var(--gray-2);
+  box-shadow: var(--shadow-top);
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  z-index: 50;
+}
+.actionbar-inner { max-width: 760px; margin: 0 auto; display: flex; gap: 10px; width: 100%; }
+.btn {
+  font-family: inherit; font-size: 14px; font-weight: 700; letter-spacing: 0.04em;
+  padding: 14px 18px; border-radius: var(--radius-sm); border: none; cursor: pointer;
+  transition: background-color 0.08s, transform 0.06s;
+  -webkit-tap-highlight-color: transparent;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary { background: var(--orange); color: var(--white); flex: 1.5; }
+.btn-primary:hover { background: #b86116; }
+.btn-secondary {
+  background: var(--white); color: var(--gray-5);
+  border: 1px solid var(--gray-3); flex: 1;
+}
+.btn-secondary:hover { border-color: var(--danger); color: var(--danger); }
+@media (max-width: 380px) { .actionbar .btn { padding: 12px 10px; font-size: 12px; } }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(17,17,17,0.5);
+  display: none; align-items: center; justify-content: center;
+  z-index: 100; padding: 16px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--white); border-radius: var(--radius);
+  max-width: 600px; width: 100%; max-height: 85vh;
+  display: flex; flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.modal-head {
+  padding: 18px 20px; border-bottom: 1px solid var(--gray-2);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.modal-head h3 {
+  margin: 0; font-size: 12px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--black); font-weight: 700;
+}
+.modal-close {
+  background: none; border: none; font-size: 22px; cursor: pointer;
+  color: var(--gray-4); padding: 0; width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-body { padding: 18px 20px; overflow-y: auto; flex: 1; }
+.modal-body pre {
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 11px; line-height: 1.5;
+  background: var(--gray-1); padding: 12px;
+  border-radius: var(--radius-sm); overflow-x: auto;
+  white-space: pre-wrap; word-break: break-word; margin: 0;
+}
+.modal-body p { margin: 0 0 10px; font-size: 14px; color: var(--gray-5); }
+.modal-foot {
+  padding: 14px 20px; border-top: 1px solid var(--gray-2);
+  display: flex; gap: 10px; justify-content: flex-end;
+}
+
+/* TOAST */
+.toast {
+  position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+  background: var(--success); color: white;
+  font-size: 13px; font-weight: 600;
+  padding: 12px 22px; border-radius: 30px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  z-index: 200; display: none; text-align: center; max-width: 90vw;
+}
+.toast.error { background: var(--danger); }
+.toast.show { display: block; animation: toastIn 0.25s ease; }
+@keyframes toastIn {
+  from { opacity: 0; transform: translate(-50%, -8px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* SPINNER */
+.spinner {
+  width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: white; border-radius: 50%;
+  animation: spin 0.7s linear infinite; display: none;
+}
+.btn.loading .spinner { display: block; }
+.btn.loading .btn-label { opacity: 0.7; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <img class="logo" src="https://marketingipf.github.io/Captacion/assets/logo-white.png" alt="RK Palanca" />
+  <div class="header-titles">
+    <p class="title">Petición de Reportaje</p>
+    <p class="subtitle">Fotografía · Andrea</p>
+  </div>
+  <div class="status" id="saveStatus" title="Los datos se guardan automáticamente en este dispositivo">
+    <span class="dot"></span><span class="label">Guardado</span>
+  </div>
+</header>
+
+<main class="container">
+  <div class="notice">
+    <span>📸</span>
+    <span>Al enviar, esta ficha se abre como <strong>correo dirigido a Andrea</strong>. Rellena todos los campos con atención: cuanto más completa, mejor reportaje.</span>
+  </div>
+
+  <form id="reportajeForm" novalidate>
+
+    <!-- 0. AGENTE E IDENTIFICACIÓN -->
+    <section class="section open" data-section="0">
+      <header class="section-header">
+        <div class="section-num">0</div>
+        <span class="section-title">Agente e identificación</span>
+        <span class="section-chevron"></span>
+      </header>
+      <div class="section-body">
+        <div class="field" data-req data-name="Agente">
+          <label class="field-label" for="agente">Agente <span class="required">*</span></label>
+          <select id="agente" name="agente">
+            <option value="">— Selecciona tu nombre —</option>
+          </select>
+        </div>
+        <div class="field" data-req data-name="Referencia">
+          <label class="field-label" for="referencia">Referencia <span class="required">*</span></label>
+          <input id="referencia" name="referencia" type="text" placeholder="Ej: 05357" />
+        </div>
+        <div class="field" data-req data-name="Tipo de operación" data-type="chip" id="f-operacion">
+          <span class="field-label">Tipo de operación <span class="required">*</span></span>
+          <div class="chip-group" data-chips="operacion">
+            <button type="button" class="chip" data-value="Venta">Venta</button>
+            <button type="button" class="chip" data-value="Alquiler">Alquiler</button>
+            <button type="button" class="chip" data-value="Otro">Otro</button>
+          </div>
+          <input type="text" class="otro-input" id="operacion_otro" placeholder="Especifica la operación" hidden />
+        </div>
+      </div>
+    </section>
+
+    <!-- 1. UBICACIÓN -->
+    <section class="section open" data-section="1">
+      <header class="section-header">
+        <div class="section-num">1</div>
+        <span class="section-title">Ubicación</span>
+        <span class="section-chevron"></span>
+      </header>
+      <div class="section-body">
+        <div class="field" data-req data-name="Dirección exacta">
+          <label class="field-label" for="direccion">Dirección exacta <span class="required">*</span></label>
+          <span class="field-hint">Si se trata de un edificio, indica la altura (planta y puerta)</span>
+          <input id="direccion" name="direccion" type="text" placeholder="Calle, número, planta y puerta" />
+        </div>
+        <div class="field" data-req data-name="Municipio">
+          <label class="field-label" for="municipio">Municipio <span class="required">*</span></label>
+          <input id="municipio" name="municipio" type="text" list="poblaciones" placeholder="Ej: Foios" />
+          <datalist id="poblaciones"></datalist>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. SERVICIOS Y REPORTAJE -->
+    <section class="section open" data-section="2">
+      <header class="section-header">
+        <div class="section-num">2</div>
+        <span class="section-title">Servicios y reportaje</span>
+        <span class="section-chevron"></span>
+      </header>
+      <div class="section-body">
+        <div class="field" data-req data-name="Servicios ofrecidos al cliente" data-type="checks" id="f-servicios">
+          <span class="field-label">Servicios ofrecidos al cliente <span class="required">*</span></span>
+          <div class="check-group" data-checks="servicios">
+            <label class="check-item"><input type="checkbox" value="Vivienda vacía - SIN homestaging (Fotos, 3D, Video y Plano)" /><span class="box"></span>Vivienda vacía · SIN homestaging (Fotos, 3D, Vídeo y Plano)</label>
+            <label class="check-item"><input type="checkbox" value="Vivienda vacía - Homestaging (HS, Fotos, 3D, Video y Plano)" /><span class="box"></span>Vivienda vacía · Homestaging (HS, Fotos, 3D, Vídeo y Plano)</label>
+            <label class="check-item"><input type="checkbox" value="Vivienda vacía - Homestaging Digital (HS Digital, Fotos, 3D, Video y Plano)" /><span class="box"></span>Vivienda vacía · Homestaging Digital (HS Digital, Fotos, 3D, Vídeo y Plano)</label>
+            <label class="check-item"><input type="checkbox" value="Vivienda donde viven - Fotos (Foto, 3D, Video y Plano)" /><span class="box"></span>Vivienda donde viven · Fotos (Foto, 3D, Vídeo y Plano)</label>
+            <label class="check-item"><input type="checkbox" value="Vivienda deshabitada con muebles - Restyling/Decoración (RS, Fotos, 3D, Video y Plano)" /><span class="box"></span>Vivienda deshabitada con muebles · Restyling / Decoración (RS, Fotos, 3D, Vídeo y Plano)</label>
+            <label class="check-item"><input type="checkbox" value="Solo Fotos" /><span class="box"></span>Solo Fotos</label>
+          </div>
+        </div>
+        <div class="field" data-req data-name="Cartel" data-type="chip" id="f-cartel">
+          <span class="field-label">Cartel <span class="required">*</span></span>
+          <div class="chip-group" data-chips="cartel">
+            <button type="button" class="chip" data-value="Sí">Sí</button>
+            <button type="button" class="chip" data-value="No">No</button>
+          </div>
+        </div>
+        <div class="field" data-req data-name="Tipología de vivienda" data-type="checks" id="f-tipologia">
+          <span class="field-label">Tipología de vivienda <span class="required">*</span></span>
+          <div class="check-group wrap" data-checks="tipologia">
+            <label class="check-item"><input type="checkbox" value="1 habitación" /><span class="box"></span>1 habitación</label>
+            <label class="check-item"><input type="checkbox" value="2 habitaciones" /><span class="box"></span>2 habitaciones</label>
+            <label class="check-item"><input type="checkbox" value="3 habitaciones" /><span class="box"></span>3 habitaciones</label>
+            <label class="check-item"><input type="checkbox" value="Terraza" /><span class="box"></span>Terraza</label>
+            <label class="check-item"><input type="checkbox" value="Balcón" /><span class="box"></span>Balcón</label>
+            <label class="check-item"><input type="checkbox" value="Piso" /><span class="box"></span>Piso</label>
+            <label class="check-item"><input type="checkbox" value="Ascensor" /><span class="box"></span>Ascensor</label>
+            <label class="check-item"><input type="checkbox" value="Casa" /><span class="box"></span>Casa</label>
+            <label class="check-item"><input type="checkbox" value="Local, Nave" /><span class="box"></span>Local, Nave</label>
+            <label class="check-item"><input type="checkbox" value="Solar" /><span class="box"></span>Solar</label>
+            <label class="check-item"><input type="checkbox" value="__otro__" id="tipologia_otro_chk" /><span class="box"></span>Otro</label>
+          </div>
+          <input type="text" class="otro-input" id="tipologia_otro" placeholder="Especifica la tipología" hidden />
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. ACCESO Y CONTACTO -->
+    <section class="section open" data-section="3">
+      <header class="section-header">
+        <div class="section-num">3</div>
+        <span class="section-title">Acceso y contacto</span>
+        <span class="section-chevron"></span>
+      </header>
+      <div class="section-body">
+        <div class="field" data-req data-name="Contacto para realizar el reportaje" data-type="radio" id="f-contacto">
+          <span class="field-label">Contacto para realizar el reportaje <span class="required">*</span></span>
+          <div class="check-group" data-radios="contacto">
+            <label class="check-item radio"><input type="radio" name="contacto" value="Llaves y avisar al propietario" /><span class="box"></span>Llaves y avisar al propietario</label>
+            <label class="check-item radio"><input type="radio" name="contacto" value="Quedar con propietario" /><span class="box"></span>Quedar con propietario</label>
+            <label class="check-item radio"><input type="radio" name="contacto" value="Quedar con inquilina" /><span class="box"></span>Quedar con inquilina</label>
+            <label class="check-item radio"><input type="radio" name="contacto" value="Recoger llaves e ir sin avisar" /><span class="box"></span>Recoger llaves e ir sin avisar</label>
+            <label class="check-item radio"><input type="radio" name="contacto" value="__otro__" /><span class="box"></span>Otro</label>
+          </div>
+          <input type="text" class="otro-input" id="contacto_otro" placeholder="Especifica cómo acceder" hidden />
+        </div>
+        <div class="field" data-req data-name="Datos de contacto">
+          <label class="field-label" for="datos_contacto">Datos de contacto: nombre + teléfono <span class="required">*</span></label>
+          <input id="datos_contacto" name="datos_contacto" type="text" placeholder="Ej: María García · 600 000 000" />
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. ESTADO DE LA VIVIENDA -->
+    <section class="section open" data-section="4">
+      <header class="section-header">
+        <div class="section-num">4</div>
+        <span class="section-title">Estado de la vivienda</span>
+        <span class="section-chevron"></span>
+      </header>
+      <div class="section-body">
+        <div class="field" data-req data-name="Importancia de vivienda limpia transmitida" data-type="chip" id="f-limpia">
+          <span class="field-label">¿Se ha transmitido al propietario la importancia de una vivienda limpia para las fotos y para maximizar el precio de venta? <span class="required">*</span></span>
+          <div class="chip-group" data-chips="limpia">
+            <button type="button" class="chip" data-value="Sí">Sí</button>
+            <button type="button" class="chip" data-value="No">No</button>
+            <button type="button" class="chip" data-value="Otro">Otro</button>
+          </div>
+          <input type="text" class="otro-input" id="limpia_otro" placeholder="Especifica" hidden />
+        </div>
+        <div class="field" data-req data-name="¿Necesita vaciado? + transmitido al propietario">
+          <label class="field-label" for="vaciado">¿La vivienda necesita vaciado? ¿Se le ha transmitido al propietario la necesidad de que esté vacía y sin trastos para maximizar el precio de venta y que haya un buen reportaje? <span class="required">*</span></label>
+          <textarea id="vaciado" name="vaciado" placeholder="Explica la situación"></textarea>
+        </div>
+        <div class="field" data-req data-name="Quién organiza la limpieza">
+          <label class="field-label" for="org_limpieza">Si la vivienda necesita limpieza, ¿quién va a organizar la limpieza para que cuando vaya Andrea esté limpia? <span class="required">*</span></label>
+          <input id="org_limpieza" name="org_limpieza" type="text" placeholder="Ej: propietario / agente / no necesita" />
+        </div>
+        <div class="field" data-req data-name="Quién organiza el vaciado">
+          <label class="field-label" for="org_vaciado">Si la vivienda necesita vaciado, ¿quién va a organizar el vaciado para que cuando vaya Andrea esté vacía y preparada? <span class="required">*</span></label>
+          <input id="org_vaciado" name="org_vaciado" type="text" placeholder="Ej: propietario / empresa de vaciados / no necesita" />
+        </div>
+        <div class="field" data-req data-name="¿Hay luz de alta?" data-type="chip" id="f-luz">
+          <span class="field-label">¿Hay LUZ de alta en la vivienda? <span class="required">*</span></span>
+          <div class="chip-group" data-chips="luz">
+            <button type="button" class="chip" data-value="Sí">Sí</button>
+            <button type="button" class="chip" data-value="No">No</button>
+            <button type="button" class="chip" data-value="Otro">Otro</button>
+          </div>
+          <input type="text" class="otro-input" id="luz_otro" placeholder="Especifica" hidden />
+        </div>
+        <div class="field" data-req data-name="Fotos de precaptación coinciden" data-type="chip" id="f-fotos">
+          <span class="field-label">¿Las fotos de precaptación coinciden con el estado en que se va a encontrar Andrea el día que vaya a hacer las fotos? <span class="required">*</span></span>
+          <div class="chip-group" data-chips="fotos">
+            <button type="button" class="chip" data-value="Sí">Sí</button>
+            <button type="button" class="chip" data-value="No">No</button>
+            <button type="button" class="chip" data-value="Otro">Otro</button>
+          </div>
+          <input type="text" class="otro-input" id="fotos_otro" placeholder="Especifica" hidden />
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. DOCUMENTACIÓN Y ENLACES -->
+    <section class="section open" data-section="5">
+      <header class="section-header">
+        <div class="section-num">5</div>
+        <span class="section-title">Documentación y enlaces</span>
+        <span class="section-chevron"></span>
+      </header>
+      <div class="section-body">
+        <div class="field" data-req data-name="Enlace vídeo de precaptación / fotos actuales">
+          <label class="field-label" for="enlace">Enlace VÍDEO de precaptación / Fotos <strong>ACTUALES</strong> <span class="required">*</span></label>
+          <span class="field-hint warn">Las fotos deben reflejar el estado ACTUAL de la vivienda</span>
+          <input id="enlace" name="enlace" type="url" placeholder="https://..." />
+        </div>
+        <div class="field" data-req data-name="Subido a HORUS" data-type="chip" id="f-horus">
+          <span class="field-label">¿Has subido exclusiva, Nota simple o Escritura y ficha catastral en HORUS? <span class="required">*</span></span>
+          <div class="chip-group" data-chips="horus">
+            <button type="button" class="chip" data-value="Sí">Sí</button>
+            <button type="button" class="chip" data-value="No">No</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. OBSERVACIONES -->
+    <section class="section open" data-section="6">
+      <header class="section-header">
+        <div class="section-num">6</div>
+        <span class="section-title">Observaciones</span>
+        <span class="section-chevron"></span>
+      </header>
+      <div class="section-body">
+        <div class="field">
+          <label class="field-label" for="observaciones">Observaciones</label>
+          <span class="field-hint warn">Este no es un lugar para poner LLÁMAME. Si crees que debes explicar el reportaje de forma personalizada directamente al fotógrafo, LLÁMALE TÚ.</span>
+          <textarea id="observaciones" name="observaciones" placeholder="Detalles útiles para el reportaje"></textarea>
+        </div>
+      </div>
+    </section>
+
+  </form>
+</main>
+
+<!-- ACTION BAR -->
+<div class="actionbar">
+  <div class="actionbar-inner">
+    <button type="button" class="btn btn-secondary" id="btnClear">Borrar</button>
+    <button type="button" class="btn btn-primary" id="btnSend">
+      <span class="spinner"></span>
+      <span class="btn-label">Enviar a Andrea</span>
+    </button>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMACIÓN -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Revisar antes de enviar</h3>
+      <button type="button" class="modal-close" data-close>×</button>
+    </div>
+    <div class="modal-body">
+      <p>Revisa que el formulario esté bien relleno antes de continuar. Al confirmar, los datos se enviarán a Andrea por Slack.</p>
+      <p id="previewSubject" style="font-weight:700; color: var(--orange);"></p>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="btn btn-secondary" data-close>Cancelar</button>
+      <button type="button" class="btn btn-primary" id="btnConfirmSend">
+        <span class="spinner"></span>
+        <span class="btn-label">Confirmar envío</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL BORRAR -->
+<div class="modal-overlay" id="clearModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>¿Borrar toda la ficha?</h3>
+      <button type="button" class="modal-close" data-close>×</button>
+    </div>
+    <div class="modal-body">
+      <p>Esta acción no se puede deshacer. Se perderán todos los datos guardados en este dispositivo.</p>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="btn btn-secondary" data-close>Cancelar</button>
+      <button type="button" class="btn btn-primary" id="btnConfirmClear">
+        <span class="btn-label">Sí, borrar todo</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="mainToast"></div>
+
+<script>
+  const STORAGE_KEY = "rk_reportaje_data";
+
+  const AGENTES = [
+    "ALEJANDRO GARCIA", "AMPARO ORTS SORIANO", "CARLOS PALANCA", "DAVID PALANCA",
+    "ELENA PONS", "FRAN ORTS", "JAVIER PALANCA", "MARIA JOSE SOLER", "VICENTE PALANCA"
+  ];
+
+  const POBLACIONES = [
+    "Albalat dels Sorells", "Alboraya", "Almácera", "Benifaraig", "Bonrepós i Mirambell",
+    "Burjassot", "Carpesa", "Emperador", "Foios", "Massalfassar", "Massamagrell",
+    "Meliana", "Museros", "Moncada", "Pobla de Farnals", "Puzol", "Rafelbuñol",
+    "Rocafort", "Tabernes Blanques", "Valencia", "Vinalesa"
+  ];
+
+  const $  = (sel) => document.querySelector(sel);
+  const $$ = (sel) => document.querySelectorAll(sel);
+
+  // Inicializar select de agentes y datalist de poblaciones
+  (() => {
+    const sAg = $("#agente");
+    AGENTES.sort().forEach(a => {
+      const o = document.createElement("option");
+      o.value = a; o.textContent = a;
+      sAg.appendChild(o);
+    });
+    const dl = $("#poblaciones");
+    POBLACIONES.sort().forEach(p => {
+      const o = document.createElement("option");
+      o.value = p;
+      dl.appendChild(o);
+    });
+  })();
+
+  // Acordeón
+  $$(".section-header").forEach(h => {
+    h.addEventListener("click", () => h.parentElement.classList.toggle("open"));
+  });
+
+  // Mostrar/ocultar campo "Otro"
+  const setupOtro = (containerSel, inputId) => {
+    const c = $(containerSel);
+    if (!c) return;
+    const update = () => {
+      const hasOtro = c.querySelector('[data-value="Otro"][aria-pressed="true"]') ||
+                      c.querySelector('input[value="__otro__"]:checked');
+      $(inputId).hidden = !hasOtro;
+      if (!hasOtro) $(inputId).value = "";
+    };
+    c.addEventListener("click", () => setTimeout(update, 20));
+  };
+  setupOtro("#f-operacion", "#operacion_otro");
+  setupOtro("#f-tipologia", "#tipologia_otro");
+  setupOtro("#f-contacto",  "#contacto_otro");
+  setupOtro("#f-limpia",    "#limpia_otro");
+  setupOtro("#f-luz",       "#luz_otro");
+  setupOtro("#f-fotos",     "#fotos_otro");
+
+  // Chips
+  $$(".chip-group button").forEach(b => {
+    b.addEventListener("click", () => {
+      const group = b.parentElement;
+      const multiSelect = group.dataset.chips === "servicios" || group.dataset.chips === "tipologia";
+      if (multiSelect) {
+        const pressed = b.getAttribute("aria-pressed") === "true";
+        b.setAttribute("aria-pressed", !pressed);
+      } else {
+        group.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", "false"));
+        b.setAttribute("aria-pressed", "true");
+      }
+      saveLocal();
+    });
+  });
+
+  // Modales
+  const openModal  = (sel) => $(sel).classList.add("open");
+  const closeModals = () => $$(".modal-overlay").forEach(m => m.classList.remove("open"));
+  $$("[data-close]").forEach(b => b.addEventListener("click", closeModals));
+
+  // Toast
+  const showToast = (txt, isErr = false) => {
+    const t = $("#mainToast");
+    t.textContent = txt;
+    t.className = "toast show" + (isErr ? " error" : "");
+    setTimeout(() => t.classList.remove("show"), 4000);
+  };
+
+  // Recolectar datos
+  const collect = () => {
+    const getChip = (g) => {
+      const b = $(`.chip-group[data-chips="${g}"] button[aria-pressed="true"]`);
+      if (!b) return "";
+      if (b.dataset.value === "Otro" && $(`#${g}_otro`)) return $(`#${g}_otro`).value.trim();
+      return b.dataset.value;
+    };
+    const getChecks = (g) => {
+      const res = [];
+      $$(`.check-group[data-checks="${g}"] input:checked`).forEach(i => {
+        if (i.value === "__otro__" && $(`#${g}_otro`)) {
+          res.push($(`#${g}_otro`).value.trim());
+        } else {
+          res.push(i.value);
+        }
+      });
+      return res;
+    };
+    const getRadio = (name) => {
+      const i = $(`input[name="${name}"]:checked`);
+      if (!i) return "";
+      if (i.value === "__otro__" && $(`#${name}_otro`)) return $(`#${name}_otro`).value.trim();
+      return i.value;
+    };
+
+    return {
+      agente:         $("#agente").value,
+      referencia:     $("#referencia").value.trim(),
+      operacion:      getChip("operacion"),
+      direccion:      $("#direccion").value.trim(),
+      municipio:      $("#municipio").value.trim(),
+      servicios:      getChecks("servicios"),
+      cartel:         getChip("cartel"),
+      tipologia:      getChecks("tipologia"),
+      contacto:       getRadio("contacto"),
+      datos_contacto: $("#datos_contacto").value.trim(),
+      limpia:         getChip("limpia"),
+      vaciado:        $("#vaciado").value.trim(),
+      org_limpieza:   $("#org_limpieza").value.trim(),
+      org_vaciado:    $("#org_vaciado").value.trim(),
+      luz:            getChip("luz"),
+      fotos:          getChip("fotos"),
+      enlace:         $("#enlace").value.trim(),
+      horus:          getChip("horus"),
+      observaciones:  $("#observaciones").value.trim()
+    };
+  };
+
+  // Auto-guardado local
+  const saveLocal = () => {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(collect())); } catch(e) {}
+  };
+  $("form").addEventListener("input", saveLocal);
+
+  // Cargar datos guardados
+  (() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const d = JSON.parse(raw);
+      $("#agente").value         = d.agente        || "";
+      $("#referencia").value     = d.referencia     || "";
+      $("#direccion").value      = d.direccion      || "";
+      $("#municipio").value      = d.municipio      || "";
+      $("#datos_contacto").value = d.datos_contacto || "";
+      $("#vaciado").value        = d.vaciado        || "";
+      $("#org_limpieza").value   = d.org_limpieza   || "";
+      $("#org_vaciado").value    = d.org_vaciado    || "";
+      $("#enlace").value         = d.enlace         || "";
+      $("#observaciones").value  = d.observaciones  || "";
+      if (d.operacion) {
+        const btn = $(`.chip-group[data-chips="operacion"] button[data-value="${d.operacion}"]`);
+        if (btn) btn.setAttribute("aria-pressed", "true");
+      }
+    } catch(e) {}
+  })();
+
+  // Validación
+  const validate = () => {
+    let ok = true;
+    $$(".field[data-req]").forEach(f => {
+      let valid = true;
+      if (f.querySelector("select") && !f.querySelector("select").value) valid = false;
+      const textInput = f.querySelector('input[type="text"]');
+      if (textInput && !textInput.hidden && !textInput.value.trim()) valid = false;
+      if (f.querySelector('input[type="url"]') && !f.querySelector('input[type="url"]').value.trim()) valid = false;
+      if (f.dataset.type === "chip"   && !f.querySelector('button[aria-pressed="true"]')) valid = false;
+      if (f.dataset.type === "checks" && !f.querySelector('input:checked'))               valid = false;
+      if (f.dataset.type === "radio"  && !f.querySelector('input:checked'))               valid = false;
+      if (f.querySelector("textarea") && !f.querySelector("textarea").value.trim())       valid = false;
+
+      f.classList.toggle("invalid", !valid);
+      if (!valid) ok = false;
+    });
+    return ok;
+  };
+
+  const buildSubject = (d) =>
+    `📸 Reportaje · Ref ${d.referencia || 'S/R'} · ${d.agente || 'AGENTE'} · ${d.municipio || ''}`;
+
+  // Botón Enviar
+  $("#btnSend").addEventListener("click", () => {
+    if (!validate()) {
+      showToast("Por favor, rellena todos los campos obligatorios (*)", true);
+      const first = $(".field.invalid");
+      if (first) {
+        first.closest(".section").classList.add("open");
+        first.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+      return;
+    }
+    const d = collect();
+    $("#previewSubject").textContent = buildSubject(d);
+    openModal("#confirmModal");
+  });
+
+  // Botón Confirmar envío
+  $("#btnConfirmSend").addEventListener("click", async () => {
+    const btn = $("#btnConfirmSend");
+    btn.classList.add("loading");
+    btn.disabled = true;
+
+    const CLOUD_FUNCTION_URL = "https://europe-west3-contratos-498808.cloudfunctions.net/slack-reportajes-andrea-v2";
+
+    try {
+      const res = await fetch(CLOUD_FUNCTION_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(collect())
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      closeModals();
+      showToast("✅ Reportaje enviado a Andrea correctamente.");
+      try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+      setTimeout(() => window.location.reload(), 2500);
+
+    } catch (err) {
+      console.error("Error al enviar:", err);
+      showToast("❌ Error al enviar. Comprueba tu conexión e inténtalo de nuevo.", true);
+    } finally {
+      btn.classList.remove("loading");
+      btn.disabled = false;
+    }
+  });
+
+  // Botón Borrar
+  $("#btnClear").addEventListener("click", () => openModal("#clearModal"));
+  $("#btnConfirmClear").addEventListener("click", () => {
+    localStorage.removeItem(STORAGE_KEY);
+    window.location.reload();
+  });
+</script>
+</body>
+</html>
