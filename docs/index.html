@@ -313,6 +313,29 @@ select {
   to   { opacity: 1; transform: translate(-50%, 0); }
 }
 
+/* DEMO BUTTON — solo para presentaciones internas, NO forma parte del flujo real */
+.btn-demo {
+  position: fixed;
+  top: 64px;
+  right: 10px;
+  z-index: 60;
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--danger);
+  background: #fff8f0;
+  border: 2px dashed var(--danger);
+  border-radius: 6px;
+  padding: 6px 9px;
+  cursor: pointer;
+  opacity: 0.8;
+  max-width: 92px;
+  line-height: 1.2;
+  text-align: center;
+}
+.btn-demo:hover, .btn-demo:active { opacity: 1; }
+
 /* SPINNER */
 .spinner {
   width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4);
@@ -336,6 +359,8 @@ select {
     <span class="dot"></span><span class="label">Guardado</span>
   </div>
 </header>
+
+<button type="button" id="btnDemoFill" class="btn-demo" title="Solo para demo interna: autorrellena el formulario con datos ficticios. No forma parte del flujo real.">DEMO_NO_PULSAR</button>
 
 <main class="container">
   <div class="notice">
@@ -858,6 +883,55 @@ const AGENTES = [
   $("#btnConfirmClear").addEventListener("click", () => {
     localStorage.removeItem(STORAGE_KEY);
     window.location.reload();
+  });
+
+  // ============================================================
+  // DEMO_NO_PULSAR — SOLO PARA DEMOSTRACIONES INTERNAS.
+  // Autorrellena la ficha con datos ficticios para no teclear en vivo
+  // delante de los agentes. NO envía nada: el presentador pulsa
+  // "Enviar a Andrea" de verdad para que se vea llegar a Slack.
+  // ============================================================
+  $("#btnDemoFill").addEventListener("click", () => {
+    $("#agente").value = "JAVI PALANCA";
+    $("#referencia").value = "DEMO-2026";
+    $("#direccion").value = "Calle Demo 1, Valencia";
+    $("#municipio").value = "Valencia";
+    $("#datos_contacto").value = "Agente Demo · 600 000 000";
+    $("#vaciado").value = "No necesita vaciado, la vivienda está en buen estado.";
+    $("#org_limpieza").value = "Propietario";
+    $("#org_vaciado").value = "No necesita";
+    $("#enlace").value = "https://example.com/demo-fotos-2026";
+    $("#observaciones").value = "⚠️ Ficha de DEMO para presentación en vivo — no es un reportaje real.";
+
+    const setChip = (group, value) => {
+      $$(`.chip-group[data-chips="${group}"] button`).forEach(b => {
+        b.setAttribute("aria-pressed", b.dataset.value === value ? "true" : "false");
+      });
+    };
+    setChip("operacion", "Venta");
+    setChip("cartel", "Sí");
+    setChip("limpia", "Sí");
+    setChip("luz", "Sí");
+    setChip("fotos", "Sí");
+    setChip("horus", "Sí");
+
+    const setChecks = (group, values) => {
+      $$(`.check-group[data-checks="${group}"] input[type="checkbox"]`).forEach(i => {
+        i.checked = values.includes(i.value);
+      });
+    };
+    setChecks("servicios", ["Solo Fotos"]);
+    setChecks("tipologia", ["3 habitaciones", "Piso", "Ascensor"]);
+
+    const radioDemo = $('input[name="contacto"][value="Llaves y avisar al propietario"]');
+    if (radioDemo) radioDemo.checked = true;
+
+    // No usamos ningún "Otro" en la demo: aseguramos que esos campos queden ocultos
+    $$(".otro-input").forEach(i => { i.hidden = true; i.value = ""; });
+
+    $$(".section").forEach(s => s.classList.add("open"));
+    saveLocal();
+    showToast("Ficha rellenada con datos DEMO. Revisa y pulsa \"Enviar a Andrea\".");
   });
 </script>
 </body>
